@@ -1,0 +1,152 @@
+# Defaults for properties available during build execution
+# These can be overriden in pipeline build data file or in the pipeline run parameters.
+#
+# Property priority resolution order:
+# 1. Jenkins Environment
+# 2. Build Properties Defaults (this file)
+# 3. Build Data File
+# 4. Pipeline Run Parameters
+# 5. OVERRIDE_PARAMS param
+
+# Build Tools
+JENKINS_ANT_FOR_BUILDS: ant-auto
+JENKINS_JDK_FOR_BUILDS: Java8_auto
+JENKINS_MAVEN_FOR_BUILDS: maven3-auto
+JENKINS_GRADLE_FOR_BUILDS: gradle-auto
+VERSION_MERGER_VERSION: 1.0.7
+
+# Base paths
+BUILD_CONFIG_ROOT_PATH: ${WORKSPACE}/resources/config
+BUILD_DATA_ROOT_PATH: ${WORKSPACE}/resources/builders
+LIB_CACHE_ROOT_PATH: ${WORKSPACE}/caches
+BUILDS_ROOT_PATH: ${WORKSPACE}/builds
+
+# Ant
+ANT_DEFAULT_COMMAND_OPTIONS: clean-all resolve dist
+ANT_TEST_TARGETS: test jacoco
+ANT_DEFAULT_DIRECTIVES: clean-all resolve publish
+
+# Maven
+MAVEN_DEFAULT_COMMAND_OPTIONS: -B -e
+MAVEN_OPTS: -Xms512m
+MAVEN_RESOLVE_REPO_URL: https://nexus.pentaho.org/content/groups/omni
+MAVEN_PUBLIC_RELEASE_REPO_URL:
+MAVEN_PUBLIC_SNAPSHOT_REPO_URL:
+MAVEN_PRIVATE_RELEASE_REPO_URL:
+MAVEN_PRIVATE_SNAPSHOT_REPO_URL:
+MAVEN_TEST_OPTS: -DsurefireArgLine=-Xmx1g
+MAVEN_DEFAULT_DIRECTIVES: clean install
+MAVEN_SETTINGS: ${BUILD_CONFIG_ROOT_PATH}/maven/settings.xml
+
+# Gradle
+GRADLE_DEFAULT_DIRECTIVES: --info --console=plain
+GRADLE_DEFAULT_COMMAND_OPTIONS: clean build
+GRADLE_TEST_TARGETS: test
+
+# Stage execution
+RUN_VERSIONING: false
+RUN_BUILDS: true
+RUN_CHECKOUTS: true
+RUN_UNIT_TESTS: true
+CREATE_TAG: false
+PUSH_CHANGES: false
+ARCHIVE_ARTIFACTS: true
+
+# General
+NOOP: false
+BUILD_RETRIES: 1
+BUILD_TIMEOUT: 360
+PARALLEL_CHUNKSIZE: 10
+PARALLEL_CHECKOUT_CHUNKSIZE: ${PARALLEL_CHUNKSIZE}
+PARALLEL_UNIT_TESTS_CHUNKSIZE: ${PARALLEL_CHUNKSIZE}
+PARALLEL_PUSH_CHUNKSIZE: ${PARALLEL_CHUNKSIZE}
+PARALLEL_TAG_CHUNKSIZE: ${PARALLEL_CHUNKSIZE}
+SLAVE_NODE_LABEL: non-master
+
+# SCM
+SCM_CREDENTIALS_ID: github-buildguy
+SCM_HOST_ROOT: https://github.com
+PENTAHO_SCM_ROOT: https://github.com/pentaho
+WEBDETAILS_SCM_ROOT: https://github.com/webdetails
+DEFAULT_BRANCH: master
+
+# Checkouts
+CHECKOUT_DEPTH: 20
+CHECKOUT_TIMESTAMP: CURRENT_TIME
+CHECKOUT_TIMEOUT_MINUTES: 10
+CHECKOUT_SLEEP_AVERAGE_SECONDS: 0
+
+# Cleanups
+CLEAN_ALL_CACHES: false
+CLEAN_BUILD_WORKSPACE: false
+CLEAN_CACHES_REGEX: .*-SNAPSHOT.*
+CLEAN_SCM_WORKSPACES: false
+
+# Version based control properties
+RELEASE_VERSION: 9.0.0.0
+SUITE_RELEASE_VERSION: 9.0.0.0
+RELEASE_MODE: false
+ADD_BUILD_ID_VERSION_TAIL: true
+
+# Commit message and list of files affected by version changes that are eligible for committing
+VERSION_MESSAGE: '[CLEANUP] updated versions via release version merger'
+VERSION_COMMIT_FILES:
+  - build.properties
+  - assembly.properties
+  - manual_assembly.properties
+  - dev_build.properties
+  - publish.properties
+  - pom.xml
+
+# Tagging
+TAG_NAME: ${RELEASE_VERSION}-RC
+TAG_MESSAGE: Tag created by ${JOB_NAME} ${BUILD_NUMBER}
+
+# Skip tagging if the RELEASE_VERSION is a SNAPSHOT
+TAG_SKIP_SNAPSHOT: true
+
+# Installer defaults
+IBUILDER_RESOURCES_ROOT_PATH: /build2/resources/ibuilder-pentaho-8.0-resources
+INSTALL_BUILDER_ROOT_DIR: /build2/resources/installbuilder-15.1.0
+
+# Defaults for Job properties
+CHANGES_FROM_LAST: FAILURE
+JOB_ITEM_DEFAULTS:
+  scmBranch: ${DEFAULT_BRANCH}
+  scmCredentials: ${SCM_CREDENTIALS_ID}
+  buildFramework: MAVEN
+  buildFile:
+  root:
+  directives: ${MAVEN_DEFAULT_DIRECTIVES}
+  testable: true
+  testsArchivePattern: ${ARCHIVE_TESTS_PATTERN}
+  execType: FORCE
+  archivable: false
+  parallelize: false
+  buildOnlyChanges: false # flag to control whether the downstreams should be built when SCM changes are detected from a upstream
+  atomicScmCheckout: false
+
+# Build failover settings
+IGNORE_PIPELINE_FAILURE: false
+
+# Slack Integration
+SLACK_INTEGRATION: false
+SLACK_CHANNEL: 'slack-channel-name'
+SLACK_TEAM_DOMAIN: 'hitachivantara-eng'
+SLACK_CREDENTIALS_ID: 'slack-token'
+
+# Archiving
+ARCHIVING_EXCLUDE_PATTERN: '(.*/.git/.*)' #exclusion group
+ARCHIVING_PATH_GROUP_REGEX: '.*/(target|dist|build)/(?:(?!.*(dependencies)).*/)?'
+ARCHIVING_CONFIG: ${BUILD_CONFIG_ROOT_PATH}/artifacts/manifest.yaml
+ARCHIVE_TESTS_PATTERN: '**/bin/**/TEST*.xml, **/target/**/TEST*.xml, **/build/**/*Test.xml, **/target/**/test*.xml'
+
+# Security parameters
+RUN_NEXUS_LIFECYCLE: false
+RUN_DEPENDENCY_CHECK: false
+PARALLEL_SECURITY_SCAN_CHUNKSIZE: 2
+NEXUS_IQ_STAGE: 'build'
+VULNERABILITY_DATABASE_PATH: '/build/security/national-vulnerability-database'
+DEPENDENCY_CHECK_SCAN_PATTERN: '**/*.jar'
+DEPENDENCY_CHECK_SUPPRESION_PATH: '/home/buildguy/suppress.xml'
+DEPENDENCY_CHECK_REPORT_PATTERN: '**/dependency-check-report.xml'
